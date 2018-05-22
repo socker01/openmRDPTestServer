@@ -4,26 +4,29 @@ import cz.vutbr.fit.openmrdp.api.OpenmRDPServerAPI;
 import cz.vutbr.fit.openmrdp.api.OpenmRDPServerAPIImpl;
 import cz.vutbr.fit.openmrdp.exceptions.AddressSyntaxException;
 import cz.vutbr.fit.openmrdp.exceptions.NetworkCommunicationException;
+import cz.vutbr.fit.openmrdp.logger.MrdpDummyLoggerImpl;
 import cz.vutbr.fit.openmrdp.logger.MrdpLogger;
 import cz.vutbr.fit.openmrdp.logger.MrdpTestLoggerImpl;
 import cz.vutbr.fit.openmrdp.security.SecurityConfiguration;
 import cz.vutbr.fit.openmrdp.security.SecurityConfigurationFactory;
-import cz.vutbr.fit.openmrdp.security.UserAuthorizator;
 import cz.vutbr.fit.openmrdp.security.UserAuthorizatorTestImpl;
+import cz.vutbr.fit.openmrdp.server.AddressRetriever;
 import cz.vutbr.fit.openmrdp.server.ServerConfiguration;
+
+import java.net.SocketException;
 
 public class Main {
 
-    private static final String SERVER_IP_ADDRESS = "192.168.1.530";
-    private static final int MRDP_PORT = 2774;
+    public static void main(String[] args) throws SocketException {
 
-    public static void main(String[] args) {
+        final MrdpLogger logger = new MrdpDummyLoggerImpl();
 
-        UserAuthorizator userAuthorizator = new UserAuthorizatorTestImpl();
-        SecurityConfiguration securityConfiguration = SecurityConfigurationFactory.createSecureSecurityConfiguration(userAuthorizator);
-        ServerConfiguration serverConfiguration = new ServerConfiguration(SERVER_IP_ADDRESS, MRDP_PORT);
-        MrdpLogger logger = new MrdpTestLoggerImpl();
-        OpenmRDPServerAPI api = new OpenmRDPServerAPIImpl(securityConfiguration, serverConfiguration, logger);
+        SecurityConfiguration securityConfiguration =
+                SecurityConfigurationFactory.createSecureSecurityConfiguration(new UserAuthorizatorTestImpl(),
+                        "examplekey.jks", "password");
+//        SecurityConfiguration securityConfiguration = SecurityConfigurationFactory.createNonSecureSecurityConfiguration();
+        ServerConfiguration serverConfiguration = new ServerConfiguration(AddressRetriever.getLocalIpAddress(), 27774, securityConfiguration);
+        OpenmRDPServerAPI api = new OpenmRDPServerAPIImpl(serverConfiguration, new MrdpTestLoggerImpl());
 
         try {
             api.receiveMessages();

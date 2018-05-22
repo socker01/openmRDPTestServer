@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Ontology>
+	<LevelUpPredicate>&lt;loc:locatedIn&gt;</LevelUpPredicate>
+	<LevelDownPredicate>&lt;loc:contains&gt;</LevelDownPredicate>
+	<Delimiter>/</Delimiter>
+	<TransitivePredicates>
+		<TransitivePredicate>
+			<Parent>rdf:type</Parent>
+			<TransitiveRelation>rdf:subtype</TransitiveRelation>
+		</TransitivePredicate>
+	</TransitivePredicates>
+</Ontology>
